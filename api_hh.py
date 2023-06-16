@@ -1,7 +1,7 @@
 import requests
 from abc import ABC, abstractmethod
 
-from vacancy import Test
+from vacancy import Vacancy
 
 
 class APItets(ABC):
@@ -11,34 +11,31 @@ class APItets(ABC):
         pass
 
 
-class HHtest(APItets):
+class HH(APItets):
     url = 'https://api.hh.ru/'
 
     def get_vacancies(self):
-
         params = {
-            'text': 'NAME:Python',
-            'page': 0,
-            'per_page': 3,
+            'text': vacancy,
+            'page': 1,
+            'per_page': 2,
             'area': 1,
-            'experience': 'noExperience'
+            'experience': 'noExperience',
+            'salary': 1,
         }
 
-        r = requests.get('https://api.hh.ru/vacancies/', params=params).json()['items']
-        vac = [Test(req['name'], req['area']['name']) for req in r]
+        api_request = requests.get('https://api.hh.ru/vacancies/', params=params).json()['items']
+        vac = [
+            Vacancy(req['name'], req['url'], req['area']['name'], req['salary'], req['snippet']['requirement'])
+            for req in api_request]
         return vac
 
 
-test = HHtest()
+test = HH()
+print('Введите вакансию, которую хотите найти')
+vacancy = input()
+
 for f in test.get_vacancies():
     print(f)
-
-param = {
-    'text': 'NAME:JS',
-    'page': 0,
-    'per_page': 2,
-    'area': 1,
-    'experience': 'noExperience'
-}
-
-q = requests.get('https://api.hh.ru/vacancies/', params=param).json()['items']
+    if f.description:
+        print()
